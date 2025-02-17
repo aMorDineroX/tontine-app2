@@ -1,0 +1,140 @@
+Tontine App Structure
+
+Fonctionnalités clés :
+Authentification des utilisateurs
+Création/Gestion des groupes de tontine
+Gestion des membres
+Planification des cotisations
+Système de paiement
+Tableau de bord
+Historique des transactions
+
+C'est un système financier informel traditionnel très répandu en Afrique qui fonctionne comme une association rotative d'épargne et de crédit (AREC). Voici les principaux aspects des tontines :
+Caractéristiques principales :
+Groupe de personnes qui se connaissent et se font confiance
+Cotisations régulières (hebdomadaires, mensuelles, etc.)
+Tour de rôle pour recevoir la somme collectée
+Aspect social et communautaire important
+Types courants de tontines :
+Tontine simple (rotation simple)
+Tontine avec enchères
+Tontine avec intérêts
+Tontine commerciale
+Pour votre application, voici les fonctionnalités essentielles à considérer :
+Gestion des membres :
+Inscription/profil des membres
+Historique des contributions
+Système de notation/réputation
+Gestion des tontines :
+Création de nouvelles tontines
+Définition des règles (montant, périodicité)
+Calendrier des tours
+Système de rappels
+Gestion financière :
+Suivi des cotisations
+Historique des versements
+Calcul des intérêts (si applicable)
+Système de paiement sécurisé
+Aspect social :
+Messagerie entre membres
+Notifications
+Système de parrainage
+Évaluation des membres
+
+
+vue spécifique de l'arborescence,
+ utilisez la commande PowerShell suivante
+cd src
+tree /f /a
+
+
+tree /f "C:\Users\morcr\OneDrive\Bureau\DevMesApps\Naat\tontine-app\src"
+
+tree /a "src"
+
+@echo off
+cd C:\Users\morcr\OneDrive\Bureau\DevMesApps\Naat\tontine-app
+tree /f /a
+
+tontine-app/
+├── .env                    # Variables d'environnement globales
+├── package.json           # Configuration du projet client
+├── tsconfig.json         # Configuration TypeScript client
+├── vite.config.ts        # Configuration Vite
+│
+├── src/                  # Code source du client (Frontend)
+│   ├── assets/          # Ressources statiques
+│   ├── components/      # Composants réutilisables
+│   │   ├── auth/
+│   │   ├── custom/
+│   │   └── ui/
+│   ├── contexts/        # Contextes React
+│   ├── features/        # Fonctionnalités principales
+│   │   ├── auth/
+│   │   ├── payments/
+│   │   └── tontine/
+│   ├── hooks/           # Hooks personnalisés
+│   ├── layouts/         # Layouts de pages
+│   ├── lib/            # Configurations et utilitaires
+│   ├── pages/          # Pages de l'application
+│   ├── styles/         # Styles globaux
+│   └── types/          # Types TypeScript
+│
+├── server/              # Code source du serveur (Backend)
+│   ├── .env            # Variables d'environnement du serveur
+│   ├── package.json    # Configuration du projet serveur
+│   ├── tsconfig.json   # Configuration TypeScript serveur
+│   │
+│   ├── src/
+│   │   ├── config/     # Configurations serveur
+│   │   │   ├── database.ts
+│   │   │   └── app.config.ts
+│   │   ├── controllers/  # Contrôleurs
+│   │   │   ├── auth.controller.ts
+│   │   │   └── tontine.controller.ts
+│   │   ├── middleware/   # Middleware
+│   │   │   ├── auth.middleware.ts
+│   │   │   ├── validate.middleware.ts
+│   │   │   └── error.middleware.ts
+│   │   ├── routes/      # Routes API
+│   │   │   ├── auth.routes.ts
+│   │   │   └── tontine.routes.ts
+│   │   ├── schemas/     # Schemas de validation
+│   │   │   ├── index.ts
+│   │   │   ├── auth.schema.ts
+│   │   │   └── tontine.schema.ts
+│   │   ├── types/       # Types serveur
+│   │   ├── utils/       # Utilitaires serveur
+│   │   ├── app.ts       # Configuration Express
+│   │   └── index.ts     # Point d'entrée du serveur
+│   │
+│   └── prisma/          # Configuration Prisma
+│       ├── schema.prisma
+│       └── migrations/
+│
+├── public/              # Fichiers publics
+└── node_modules/        # Dépendances (ignorées par git)
+
+# Structure Technique
+
+## Frontend (React + TypeScript)
+- Components réutilisables
+- Features modulaires
+- Gestion d'état centralisée
+- Routes protégées
+- Validation des formulaires
+
+## Backend (Node.js + Express)
+- API RESTful
+- Authentication JWT
+- Base de données PostgreSQL
+- Prisma ORM
+- Validation avec Zod
+- Schemas de validation structurés
+
+## Sécurité
+- Encryption des données sensibles
+- Protection CORS
+- Validation des entrées
+- Sessions sécurisées
+- Schemas de validation stricts

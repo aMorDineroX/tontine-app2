@@ -1,0 +1,59 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: tontine_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install Dependencies
+      run: |
+        npm ci
+        cd server && npm ci
+        
+    - name: Run Migrations
+      run: |
+        cd server
+        npx prisma migrate deploy
+      env:
+        DATABASE_URL: postgresql://postgres:password123@localhost:5432/tontine_db_test
+        
+    - name: Run Tests
+      run: |
+        npm run test:ci
+        cd server && npm run test:ci
+      env:
+        DATABASE_URL: postgresql://postgres:password123@localhost:5432/tontine_db_test
+        JWT_SECRET: test_secret
+        NODE_ENV: test
+        
+    - name: Upload Coverage Reports
+      uses: codecov/codecov-action@v3

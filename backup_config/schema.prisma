@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  name          String
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  participations    TontineParticipation[]
+  createdTontines   Tontine[]
+}
+
+model Tontine {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  amount      Float
+  frequency   String    // WEEKLY, MONTHLY, etc.
+  startDate   DateTime
+  endDate     DateTime?
+  creatorId   String
+  creator     User      @relation(fields: [creatorId], references: [id])
+  participants TontineParticipation[]
+  payments    Payment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  status      String    @default("PENDING") // PENDING, ACTIVE, COMPLETED, CANCELLED
+}
+
+model TontineParticipation {
+  id        String   @id @default(uuid())
+  userId    String
+  tontineId String
+  user      User     @relation(fields: [userId], references: [id])
+  tontine   Tontine  @relation(fields: [tontineId], references: [id])
+  joinedAt  DateTime @default(now())
+  position  Int      // Position dans le cycle de rotation
+  status    String   @default("PENDING") // PENDING, ACTIVE, COMPLETED
+
+  @@unique([userId, tontineId])
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  amount    Float
+  tontineId String
+  tontine   Tontine  @relation(fields: [tontineId], references: [id])
+  payerId   String
+  date      DateTime @default(now())
+  status    String   // PENDING, COMPLETED, FAILED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

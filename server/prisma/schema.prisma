@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // For soft delete
+  tontines      Tontine[] @relation("TontineCreator")
+  memberships   TontineMember[]
+  payments      Payment[]
+
+  @@index([email])
+}
+
+model Tontine {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  amount        Float
+  frequency     String    // DAILY, WEEKLY, MONTHLY
+  membersCount  Int
+  startDate     DateTime
+  endDate       DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // For soft delete
+  creator       User      @relation("TontineCreator", fields: [creatorId], references: [id])
+  creatorId     String
+  members       TontineMember[]
+  payments      Payment[]
+
+  @@index([creatorId])
+}
+
+model TontineMember {
+  id          String    @id @default(cuid())
+  userId      String
+  tontineId   String
+  joinedAt    DateTime  @default(now())
+  position    Int       // Position in rotation
+  deletedAt   DateTime? // For soft delete
+  user        User      @relation(fields: [userId], references: [id])
+  tontine     Tontine   @relation(fields: [tontineId], references: [id])
+  payments    Payment[]
+
+  @@unique([tontineId, position])
+  @@index([userId])
+  @@index([tontineId])
+}
+
+model Payment {
+  id            String    @id @default(cuid())
+  amount        Float
+  status        String    // PENDING, COMPLETED, FAILED
+  paymentDate   DateTime  @default(now())
+  userId        String
+  tontineId     String
+  memberId      String
+  user          User      @relation(fields: [userId], references: [id])
+  tontine       Tontine   @relation(fields: [tontineId], references: [id])
+  member        TontineMember @relation(fields: [memberId], references: [id])
+
+  @@index([userId])
+  @@index([tontineId])
+  @@index([memberId])
+}

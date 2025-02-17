@@ -1,0 +1,2 @@
+# Créer et appliquer la première migration
+npx prisma migrate dev --name init
