@@ -1,48 +1,43 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { TontineModel } from '../../../types/database';
-import { tontineService } from '../services/tontineService';
+import { TontineModel, TontineMemberModel } from '@/types/database';
+import { tontineApi } from '../services/tontine.service';
 
 interface TontineState {
-  tontines: TontineModel[];
   currentTontine: TontineModel | null;
+  members: TontineMemberModel[];
   isLoading: boolean;
   error: string | null;
   fetchTontines: () => Promise<void>;
-  createTontine: (data: Omit<TontineModel, 'id'>) => Promise<void>;
-  setCurrentTontine: (tontine: TontineModel | null) => void;
+  setCurrentTontine: (tontine: TontineModel) => void;
+  setMembers: (members: TontineMemberModel[]) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 export const useTontineStore = create<TontineState>()(
   devtools(
     (set) => ({
-      tontines: [],
       currentTontine: null,
+      members: [],
       isLoading: false,
       error: null,
       fetchTontines: async () => {
         set({ isLoading: true });
         try {
-          const tontines = await tontineService.getTontinesByStatus('ACTIVE');
-          set({ tontines, isLoading: false });
+          const tontines = await tontineApi.getTontines();
+          set({ currentTontine: tontines[0], isLoading: false });
         } catch (error) {
-          set({ error: 'Erreur lors du chargement des tontines', isLoading: false });
-        }
-      },
-      createTontine: async (data) => {
-        set({ isLoading: true });
-        try {
-          const newTontine = await tontineService.createTontine(data);
-          set((state) => ({
-            tontines: [...state.tontines, newTontine],
-            isLoading: false
-          }));
-        } catch (error) {
-          set({ error: 'Erreur lors de la création de la tontine', isLoading: false });
+          set({ error: 'Failed to fetch tontines', isLoading: false });
         }
       },
       setCurrentTontine: (tontine) => set({ currentTontine: tontine }),
+      setMembers: (members) => set({ members }),
+      setLoading: (loading) => set({ isLoading: loading }),
+      setError: (error) => set({ error })
     }),
-    { name: 'tontine-store' }
+    {
+      name: 'tontine-store'
+    }
   )
 );

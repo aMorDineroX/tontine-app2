@@ -1,47 +1,41 @@
-// Types
-type NotificationType = 'success' | 'error' | 'info' | 'warning';
+import { PrismaClient } from '@prisma/client';
 
-interface NotificationMessage {
+const prisma = new PrismaClient();
+
+type NotificationType = 'PAYMENT_DUE' | 'BID_OUTBID' | 'ROUND_STARTED' | 'ROUND_ENDED';
+
+interface NotificationData {
   type: NotificationType;
+  title: string;
   message: string;
-  duration?: number;
+  recipientId: string;
+  metadata?: Record<string, any>;
 }
 
-type NotificationCallback = (notification: NotificationMessage) => void;
-
-// Service class
-class NotificationService {
-  private subscribers: ((notification: NotificationMessage) => void)[] = [];
-
-  subscribe(callback: (notification: NotificationMessage) => void) {
-    this.subscribers.push(callback);
-    return () => {
-      this.subscribers = this.subscribers.filter(sub => sub !== callback);
-    };
+export class NotificationService {
+  static async create(data: NotificationData) {
+    return await prisma.notification.create({
+      data: {
+        type: data.type,
+        title: data.title,
+        message: data.message,
+        userId: data.recipientId,
+        metadata: data.metadata
+      }
+    });
   }
 
-  success(message: string, duration?: number) {
-    this.notify('success', message, duration);
+  static async markAsRead(notificationId: string) {
+    return await prisma.notification.update({
+      where: { id: notificationId },
+      data: { readAt: new Date() }
+    });
   }
 
-  error(message: string, duration?: number) {
-    this.notify('error', message, duration);
-  }
-
-  info(message: string, duration?: number) {
-    this.notify('info', message, duration);
-  }
-
-  warning(message: string, duration?: number) {
-    this.notify('warning', message, duration);
-  }
-
-  private notify(type: NotificationType, message: string, duration = 3000) {
-    this.subscribers.forEach(subscriber => 
-      subscriber({ type, message, duration })
-    );
+  static async getUserNotifications(userId: string) {
+    return await prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' }
+    });
   }
 }
-
-// Single instance export
-export const notificationService = new NotificationService();

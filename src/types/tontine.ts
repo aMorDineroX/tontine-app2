@@ -16,11 +16,11 @@ export interface TontineType {
   name: string;
   description?: string;
   amount: number;
-  frequency: PaymentFrequency;
+  frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY';
   membersCount: number;
   startDate: Date;
   endDate: Date;
-  status: TontineStatus;
+  status: 'PENDING' | 'ACTIVE' | 'COMPLETED';
   creatorId: string;
   currentRound: number;
   totalRounds: number;

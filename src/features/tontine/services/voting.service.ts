@@ -1,3 +1,8 @@
+import { PrismaClient } from '@prisma/client';
+import { NotificationService } from '@/features/notifications/services/notification.service';
+
+const prisma = new PrismaClient();
+
 export class VotingService {
   static async createPoll({
     tontineId,
@@ -26,9 +31,7 @@ export class VotingService {
       }
     });
 
-    // Notifier tous les membres
     await NotificationService.notifyNewPoll(poll.id);
-    
     return poll;
   }
 
